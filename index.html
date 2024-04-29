@@ -7,5 +7,589 @@
 </head>
 <body>
     <h1>Tohle je git repo pro nasi hodinu</h1>
+ vojta
+    <h2>vojta</h2>
+
+    <h2>kuba berka</h2>
+    <h1>My name is Mikael Manukyan</h1>
+    <p>moje jmeno je jenda lauš</p>
+    <h2>Michal Prikryl</h2>
+    <h2>Jmenuji se Adam Paseka</h2>
+
 </body>
 </html>
+
+
+
+
+
+import sys, os
+import pygame, sys
+import random
+#from pygame.locals import *
+import time
+#import audio
+smer_postavy = "right"
+fronta = []
+#j = 0
+sys.setrecursionlimit(3000)
+global b
+b = False
+cil = -1
+pygame.init()
+key = ""
+font = pygame.font.SysFont("Comic Sans MS", 35)
+font2 = pygame.font.SysFont("Comic Sans MS", 10)
+zluta = (250, 220, 0)
+brecka = (150, 180, 120)
+zelena = (0, 255, 0)
+cerna = (0, 0, 0)
+cervena = (255, 0, 0)
+bila = (255, 255, 255)
+modra = (100,100,255)
+okno_rozmery = [750, 750] #rozmery okna, ve kterem bude bludiste
+strana = 23 #velikost policka bludiste # muzes to zmenit
+posun = 25 #posun okraje bludiste
+
+
+
+
+ 
+
+
+
+# Initialize pygame
+pygame.init()
+panacek_right = pygame.image.load("panacek_right.png")
+panacek_left = pygame.image.load("panacek_left.png")
+icon = pygame.image.load("icon.png")
+pygame.display.set_icon(icon)
+koberec = pygame.image.load("koberec.png")
+koberec = pygame.transform.scale(koberec,(strana,strana))
+among_us_melody = pygame.mixer.Sound("among_us_melody.mp3")
+crazy_frog_melody = pygame.mixer.Sound("crazy_frog_melody.mp3")
+wall = pygame.image.load("wall.jpg")
+wall = pygame.transform.scale(wall,(strana,strana))
+among_us_right = pygame.image.load("among_us_right.png")
+dvere = pygame.image.load("dvere.png")
+dvere = pygame.transform.scale(dvere,(strana,strana))
+brecka_dvere = pygame.image.load("brecka_dvere.png")
+brecka_dvere = pygame.transform.scale(brecka_dvere,(strana,strana))
+among_us_left = pygame.image.load("among_us_left.png")
+play_button = pygame.image.load("play_button.png")
+down_button = pygame.image.load("down_button.png")
+up_button = pygame.image.load("up_button.png")
+kosmonaut_right = pygame.image.load("kosmonaut_right.png")
+kosmonaut_left = pygame.image.load("kosmonaut_left.png")
+super_mario_right = pygame.image.load("super_mario_right.png")
+super_mario_left = pygame.image.load("super_mario_left.png")
+pozice_hrace = [1, 1] 
+pygame.display.set_caption('  Bludiště')
+
+velikost = [30,30] #rozmery bludiste v poctu poli # muzes to zmenit
+cil_pozice = [velikost[0] - 2,velikost[1] - 2] #pozice cile
+bludiště_obsah = [] #dvojrozmerne pole obsahujici bludiste, 1=stena, 2=okrajova stena, 0=cesta, -1=cil
+pocatek = [1, 1]
+n = 0
+smery = [[0, 1], [1, 0], [0, -1], [-1, 0]] #seznam smeru
+pozice = [pocatek]
+prošlé_pozice = [pocatek] #seznam navstivenych pozic pri hledani cesty
+cesta = [pocatek] #seznam obsahujici cestu od pocatku do cile
+pom = []
+pocet_postav = 4
+postavy = ["among_us_left.png","among_us_right.png"],["kosmonaut_left.png","kosmonaut_right.png"],["super_mario_left.png","super_mario_right.png"],["panacek_left.png","panacek_right.png"]
+pygame.init()
+pygame.mixer.init()
+okno = pygame.display.set_mode((okno_rozmery))
+okno.fill(bila)
+pygame.display.update()
+vybrana_postava_left = postavy [0] [0]
+vybrana_postava_right = postavy [0] [1]
+#okno.blit(among_us_right,(300,200))
+postava_cislo = 0
+bezi = True
+barvy = [zelena,cervena,cerna,zluta]
+random2 = barvy[random.randint(0,(len(barvy)-1))]
+#import audio
+cesta_go = []
+music = crazy_frog_melody
+show_pos = False
+def play_melody():
+    pygame.mixer.Sound.play(music,-1)
+
+
+
+def vykresli_cestu():# vykresli cestu k cili ulozenou v seznamu cesta
+  pass
+  cesta.remove(cesta[len(cesta)-1])
+  for i in range(len(cesta)):
+    
+    #nakresli_obdelnik(brecka, cesta[i][1] * strana + posun, cesta[i][0] * strana + posun, strana, 1)
+    okno.blit(koberec,(cil_pozice[0] * strana + posun, cil_pozice[1] * strana + posun))
+    time.sleep(0.2)
+    pygame.display.update()
+  okno.blit(brecka_dvere,(cil_pozice[0] * strana + posun, cil_pozice[1] * strana + posun))
+  time.sleep(0.2)
+  pygame.display.update()
+
+def je_v_seznamu(prvek, seznam): #zjisti, zda je prvek v seznamu
+  for i in range(len(seznam)):
+    if seznam[i] == prvek:
+      return True
+  return False
+
+def spravna_cesta():# najde cestu k cili
+  aktualni_pozice = pocatek
+  while cil_pozice != aktualni_pozice: #dokud jsem nedosel do cile
+    muzu_jit = False
+    i = 0
+    
+    #time.sleep(1)
+    while not muzu_jit:
+      if i < 4: #i je cislo smeru
+        #time.sleep(1)
+        nova_pozice =soucet_vektoru(aktualni_pozice, smery[i])
+        if bludiště_obsah[nova_pozice[0]][nova_pozice[1]] != 1 and bludiště_obsah[nova_pozice[0]][nova_pozice[1]] != 2: #pokud nova pozice neni stena
+          if not je_v_seznamu(nova_pozice, prošlé_pozice): #pokud nova pozice uz nebyla navstivena
+            aktualni_pozice = nova_pozice #presunu se na novou pozici
+            prošlé_pozice.append(aktualni_pozice)
+            cesta.append(aktualni_pozice)
+            muzu_jit = True
+            
+        i += 1 #zkusim dalsi smer
+      else: #zadny smer nevyhovuje, vracim se
+        aktualni_pozice = cesta[len(cesta)-2]
+        cesta.remove(cesta[len(cesta)-1])
+        muzu_jit = True
+
+
+
+
+
+def vytvor_ramecek():# vytvori okraj bludiste
+    for i in range(velikost[0]):
+        pom = []
+        for j in range(velikost[1]):
+            if i == 0 or j == 0 or i == velikost[0] - 1 or j == velikost[1] - 1:
+                pom.append(2)
+            else:
+                pom.append(1)
+        bludiště_obsah.append(pom)
+
+
+
+
+
+def win_test():# zjisti jestli byla dohrana hra
+    if bludiště_obsah[pozice_hrace[0]][pozice_hrace[1]] == cil:
+        return True
+
+def getkey(key):
+
+
+    for udalost in pygame.event.get():
+        if udalost.type == pygame.QUIT:
+            hra = False
+            bezi = False
+        if udalost.type == pygame.KEYDOWN:
+            if udalost.key == pygame.K_UP:
+                key = "up"
+                b = True
+            elif udalost.key == pygame.K_DOWN:
+                key = "down"
+                b = True             
+            elif udalost.key == pygame.K_RIGHT:
+                key = "right"
+                b = True  
+            elif udalost.key == pygame.K_LEFT:
+                key = "left"
+                b = True  
+            elif udalost.key == pygame.K_p:
+                key = "p"
+                b = True  
+            elif udalost.key == pygame.K_ESCAPE:
+                key = "esc"
+                b = True  
+            elif udalost.key == pygame.K_F3:
+                key = "f3"
+                b = True      
+            else:
+                b = False    
+    return key 
+
+
+def soucet_vektoru(vektor1, vektor2): #secte vektory
+    soucet = []
+    for i in range(len(vektor1)):
+        soucet.append(vektor1[i] + vektor2[i])
+    return soucet
+
+
+
+
+
+def vytvor_bludiště(pozice, smer): # vygeneruje bludiste
+    j = 0
+    j = j + 1
+    fronta.append([pozice, smer]) #fronta obsahuje seznam poli cest, ze kterych bude mozno pokracovat a smeru, z kterych jsme na tato pole prisli
+    while len(fronta) != 0:
+        l = random.randint(0, (len(fronta) - 1))
+        pozice = fronta[l][0]
+        smer = fronta[l][1] #z ktereho smeru jsme prisli
+        fronta.remove(fronta[l]) #vybereme nahodne pole fronty a odebereme ho
+        if zkus_směr(pozice, smer): #zkusime rozsirit bludiste z vybraneho pole
+            bludiště_obsah[pozice[1]][pozice[0]] = 0
+            pouzite_smery = [0, 0, 0, 0]
+            pouzite_smery[smer] = 1
+            for i in range(3): #zkousime postupne vsechny smery v nahodnem poradi
+                s = random.randint(0, 3)
+                while pouzite_smery[s] == 1:
+                    s = random.randint(0, 3)
+                pouzite_smery[s] = 1
+                nova_pozice = soucet_vektoru(pozice, smery[s])
+                if bludiště_obsah[nova_pozice[1]][nova_pozice[0]] != 2:
+                    if zkus_směr(nova_pozice, (s + 2) % 4):
+                        fronta.append([nova_pozice, (s + 2) % 4])
+        #vytvor_bludiště(nova_pozice,(s+2)%4)
+        #cil_pozice = pozice
+    #bludiště_obsah[cil_pozice[0]] [cil_pozice[1]] = cil
+
+def zkus_směr(nova_pozice, směr): #zjisti jestli se ma vratit
+    soused1 = soucet_vektoru(nova_pozice, smery[(směr + 1) % 4])
+    soused2 = soucet_vektoru(nova_pozice, smery[(směr + 2) % 4])
+    soused3 = soucet_vektoru(nova_pozice, smery[(směr + 3) % 4])
+    if bludiště_obsah[soused1[1]][soused1[0]] != 0 and bludiště_obsah[soused2[1]][soused2[0]] != 0 and bludiště_obsah[soused3[1]][soused3[0]] != 0:
+        return True
+    else:
+        return False
+
+
+def Generuj():# vygeneruje funkcni bludiste
+    vytvor_bludiště(pocatek, 1)
+    bludiště_obsah[velikost[0] - 2][velikost[1] - 2] = cil
+    #cil_pozice = [velikost[0] - 2,velikost[1] - 2]
+  
+
+
+def vypis(s): # vypise bludiste v cislech
+    for radek in s:
+        for pole in radek:
+            print(pole, end=" ")
+
+        print()
+
+
+def nakresli_obdelnik(barva, x, y, delka_hrany, okraj): # nakresli obdelnik
+    #pygame.draw.rect(okno, barva,( x, y, delka_hrany, delka_hrany),okraj)
+    pygame.draw.rect(okno, barva, (x, y, delka_hrany, delka_hrany))
+
+
+def vykreslování(): #vykresli bludiste
+    for i in range(velikost[0]):
+        for j in range(velikost[1]):
+            if bludiště_obsah[i][j] == 1 or bludiště_obsah[i][j] == 2:
+                okno.blit(wall,(j * strana + posun, i * strana + posun))
+                #nakresli_obdelnik(cerna, j * strana + posun,i * strana + posun, strana, 1)
+            elif bludiště_obsah[i][j] == cil:
+                #nakresli_obdelnik(zelena, j * strana + posun,i * strana + posun, strana, 1)
+                okno.blit(dvere,(j * strana + posun, i * strana + posun))
+            else:
+                #nakresli_obdelnik(zluta, j * strana + posun,i * strana + posun, strana, 1)
+                okno.blit(koberec,(j * strana + posun, i * strana + posun))
+    pygame.display.update()
+
+
+def vykresli_ctverecek(pozice_myši, barva): #vykresli ctvarecek
+    nakresli_obdelnik(barva, pozice_myši[0] * strana + posun,
+       pozice_myši[1] * strana + posun, strana, 1)
+    pygame.display.update()
+    
+def blikej():
+    for i in range(velikost[0]):
+        for j in range(velikost[1]):
+            random2 = barvy[random.randint(0,len(barvy)-1)]
+            nakresli_obdelnik(random2, j * strana + posun,i * strana + posun, strana, 1)
+    time.sleep(0.1)
+    pygame.display.update()
+
+def jdi_po_cestě():
+    e = 0.2
+    pozice_hrace = cesta[0]
+    for w in range(len(cesta)):
+        key = getkey("") #[0]
+        if key == "esc":
+            pygame.display.quit()
+            n = 1
+            for i in range(3):
+                for j in range(10):
+                    print()
+                print("stopping")
+                time.sleep(1)
+                for j in range(10):
+                    print()
+                print("stopping.")
+                time.sleep(1)
+                for i in range(10):
+                    print()
+                print("stopping..")
+                time.sleep(1)
+                for i in range(10):
+                    print()
+                print("stopping...")
+                time.sleep(1)           
+            quit()
+        if key == "p":
+            e /= 10
+            print("aa")
+        okno.blit(koberec,(pozice_hrace[1]*strana+posun,pozice_hrace[0]*strana+posun))
+        pozice_hrace = cesta[w]
+        p = [0,0]
+        p [1] = pozice_hrace[0]*strana +posun
+        p [0] = pozice_hrace[1]*strana +posun
+        okno.blit(vybrana_postava_right,(p))
+        if pozice_hrace == cil_pozice:
+            okno.blit(dvere,(cil_pozice[0] * strana + posun, cil_pozice[1] * strana + posun))
+            pygame.display.update()
+            q = str(round((time.time() - time1),3))
+
+            a = "You won with time "+ q + " seconds"
+            for i in range(20):
+               a1 = random.randint(0,255)
+               a2 = random.randint(0,255)
+               a3 = random.randint(0,255)
+               text = font.render(a, True, (a1,a2,a3))
+               okno.blit(text, (posun+strana,100))
+               pygame.display.update()
+               time.sleep(0.3)
+            quit()
+        pygame.display.update()
+        time.sleep(e)
+        pass
+        
+    
+play = True
+key = "a"
+
+  
+#play_melody()
+
+
+  
+okno.fill(bila)
+key = ""
+while key != "p":
+  key = getkey("") #[0]
+  if key == "down":
+    
+    if postava_cislo != 0:
+      postava_cislo -= 1
+    else:
+      postava_cislo = pocet_postav -1
+  if key == "up":
+    
+    if postava_cislo != pocet_postav - 1:
+        postava_cislo += 1
+    else:
+        postava_cislo = 0
+  if key == "esc":
+        pygame.display.quit()
+        n = 1
+        for i in range(3):
+          for j in range(10):
+            print()
+          print("stopping")
+          time.sleep(1)
+          for j in range(10):
+            print()
+          print("stopping.")
+          time.sleep(1)
+          for i in range(10):
+            print()
+          print("stopping..")
+          time.sleep(1)
+          for i in range(10):
+            print()
+          print("stopping...")
+          time.sleep(1)
+        pygame.mixer.Sound.stop(music)
+        quit()
+  postava_left = postavy[postava_cislo] [0]
+  postava_right = postavy[postava_cislo] [1]
+  vybrana_postava_right = pygame.image.load(postava_right)
+  vybrana_postava_left = pygame.image.load(postava_left)
+  vybrana_postava_right = pygame.transform.scale(vybrana_postava_right, (300, 300))
+  vybrana_postava_left = pygame.transform.scale(vybrana_postava_left, (300, 300))
+  okno.blit(vybrana_postava_right,(200,200))
+  
+
+  
+
+  pygame.display.update()
+
+
+
+pygame.mouse.get_pos()
+
+
+okno.fill(bila)
+vytvor_ramecek()
+
+
+Generuj()
+
+
+
+
+
+
+#vykresli_postavu(pozice_hrace,postava)
+p = [0,0]
+p [0] = pozice_hrace[0]*strana +posun
+p [1] = pozice_hrace[1]*strana +posun
+vybrana_postava_left = pygame.transform.scale(vybrana_postava_left, (strana, strana))
+vybrana_postava_right = pygame.transform.scale(vybrana_postava_right, (strana, strana))
+okno.blit(vybrana_postava_right,(p))
+pygame.display.update()
+vykreslování()
+spravna_cesta()
+#okno.blit(vybrana_postava_right,(p))
+pygame.display.update()
+
+"""
+time.sleep(7)
+print("3")
+time.sleep(1)
+print("2")
+time.sleep(1)
+print("1")
+time.sleep(1)
+print("start")
+"""
+time1 = time.time()
+#jdi_po_cestě()
+#vykresli_cestu()
+#play_melody()
+pygame.display.update()
+
+
+
+
+s= 1
+try:
+    while True:
+        k = getkey("") #zjisti, ktera klavesa byla stisknuta
+
+        if k == "esc":
+          pygame.display.quit()
+          n = 1
+          for i in range(3):
+            for j in range(10):
+              print()
+            print("stopping")
+            time.sleep(1)
+            for j in range(10):
+              print()
+            print("stopping.")
+            time.sleep(1)
+            for i in range(10):
+              print()
+            print("stopping..")
+            time.sleep(1)
+            for i in range(10):
+              print()
+            print("stopping...")
+            time.sleep(1)
+          quit()
+
+        if k == 'left':
+          smer_postavy = "left"
+          s= 0
+        if k == 'right':
+          smer_postavy = "right"
+          s = 0 
+        if k != "":
+          print(k)
+        if k == "f3":
+          if show_pos == False:
+            show_pos = True
+          else:
+            show_pos = False
+            okno.fill(bila)
+            vykreslování()
+            pygame.display.update()
+
+          
+          
+        if k == 'right' and bludiště_obsah[pozice_hrace[1]][pozice_hrace[0] +1] < 1:
+            okno.blit(koberec,(pozice_hrace[0]*strana+posun,pozice_hrace[1]*strana+posun))
+            pozice_hrace[0] += 1
+            s= 0
+        elif k == 'left' and bludiště_obsah[pozice_hrace[1]][pozice_hrace[0] -1] < 1:
+            okno.blit(koberec,(pozice_hrace[0]*strana+posun,pozice_hrace[1]*strana+posun))
+            pozice_hrace[0] -= 1
+            s= 0
+        elif k == 'down' and bludiště_obsah[pozice_hrace[1] +1][pozice_hrace[0]] < 1:
+            okno.blit(koberec,(pozice_hrace[0]*strana+posun,pozice_hrace[1]*strana+posun))
+            pozice_hrace[1] += 1
+            s= 0
+        elif k == 'up' and bludiště_obsah[pozice_hrace[1] - 1][pozice_hrace[0]] < 1:
+            okno.blit(koberec,(pozice_hrace[0]*strana+posun,pozice_hrace[1]*strana+posun))
+            pozice_hrace[1] -= 1
+            s= 0
+        else:
+            s= 1
+
+        if win_test():
+            okno.blit(dvere,(cil_pozice[0] * strana + posun, cil_pozice[1] * strana + posun))
+            pygame.display.update()
+            
+            quit()
+         #000000000000000000000000
+        #vykresli_postavu(pozice_hrace,postava)
+        p = [0,0]
+        p [0] = pozice_hrace[0]*strana +posun
+        p [1] = pozice_hrace[1]*strana +posun
+        
+        if show_pos:
+          #okno.fill(bila)
+          #vykreslování()
+          #qq
+          pygame.draw.rect(okno,(( 255,255,255)), (posun+strana, 730, 750-(posun+strana), 20))
+          čas = (time.time() - time1)
+          text = font2.render(str(round(čas,3))+" seconds", True, (0,0,0))
+          okno.blit(text, (posun+strana,730))
+          
+          pygame.display.update()
+        if s == 0:
+          if  smer_postavy == "right":
+            okno.blit(vybrana_postava_right,(p))
+          else:
+            okno.blit(vybrana_postava_left,(p))
+        
+
+        
+        
+        
+        pygame.display.update()
+        #time.sleep(0.1)
+except (KeyboardInterrupt, SystemExit):
+  if n == 0:
+    #os.system('stty sane')
+    q = str(round((time.time() - time1),3))
+    a = "You won with time "+ q + " seconds"
+    
+    for i in range(20):
+       a1 = random.randint(0,255)
+       a2 = random.randint(0,255)
+       a3 = random.randint(0,255)
+       text = font.render(a, True, (a1,a2,a3))
+       okno.blit(text, (posun+strana,100))
+       pygame.display.update()
+       time.sleep(0.3)
+    pygame.mixer.Sound.stop(music)
+  else:
+    #os.system('stty sane')
+    pygame.mixer.Sound.stop(music)
+
+    time.sleep(2)
+    pass
